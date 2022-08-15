@@ -1,41 +1,37 @@
 import React, { Component } from 'react';
+import { useState } from "react";
+import { useEffect } from 'react';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import './App.css';
 import ErrorBoundry from '../components/ErrorBoundry';
 
-class App extends Component {
-    constructor(){
-        super()
+function App(){
 
-        this.state = {
-            robots : [],
-            searchfield : ''
-        }
-    }
+    const [robots, setRobots] = useState([]);
+    const [searchfield, setSearchField] = useState('');
 
-    componentDidMount() {
+    useEffect(() => {
         fetch('https://jsonplaceholder.typicode.com/users')
         .then(response => response.json())
-        .then(users => this.setState({ robots: users}))
+        .then(users => setRobots(users))
+    });
+
+    function onSearchChange (event){
+        setSearchField(event.target.value );
     }
 
-    onSearchChange = (event) => {
-        this.setState({ searchfield: event.target.value });
-    }
+        // const State = this.state;
+        const filteredRobots = robots.filter(robot => {
+            return robot.name.toLowerCase().includes(searchfield.toLowerCase())
+        });
 
-    render() {
-        const State = this.state;
-        const filteredRobots = State.robots.filter(robot => {
-            return robot.name.toLowerCase().includes(State.searchfield.toLowerCase())
-        })
-
-        if(State.robots.length === 0) {
+        if(robots.length === 0) {
             return (
                 <div className="tc">
                     <h1 className = "f1 tracked">RoboFriends</h1>
-                    <SearchBox searchChange = {this.onSearchChange} />
+                    <SearchBox searchChange = {onSearchChange} />
                     <p className="loading f3 bg-light-green dib br3 pa2 ma2 bw2">Loading...</p>
                 </div>
                 )
@@ -54,7 +50,7 @@ class App extends Component {
             return (
                 <div className="tc">
                     <h1 className = "f1 tracked">RoboFriends</h1>
-                    <SearchBox searchChange = {this.onSearchChange} />
+                    <SearchBox searchChange = {onSearchChange} />
                     <Scroll>
                         <ErrorBoundry>
                             <CardList robots = {filteredRobots} />
@@ -64,8 +60,6 @@ class App extends Component {
                 )
             }
         }
-    }
    
 }
-
-export default App
+export default App;
